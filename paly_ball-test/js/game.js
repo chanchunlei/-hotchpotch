@@ -62,7 +62,7 @@ function Basketball() {
 		console.log(this.canvas.height);*/
         this.canvas.style.width = w + "px", this.canvas.style.height = h + "px"
     }, 
-	this.start = function() {
+	this.start = function() {//开始类
         var s = this, i = Date.now();
         setInterval(function() {
             var e = Date.now();
@@ -126,6 +126,7 @@ function Basketball() {
 	//循环 更新
 	this.loop = function(t) {
 		//console.log("loop()");
+        // console.log()
         this.update(t), this.draw(this.canvas.getContext("2d"))
     }, 
 	//更新 游戏
