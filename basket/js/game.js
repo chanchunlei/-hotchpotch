@@ -66,7 +66,7 @@ function Basketball() {
         var s = this, i = Date.now();
         setInterval(function() {
             var e = Date.now();
-            t = e - i, s.loop(t / 1000), i = e   //更新时间
+            t = e - i, s.loop(t / 1000), i = e   //循环，更新，时间
         }, .06), this.hoops.push(new Hoop(246, 260));  //加载篮板
 		var timer = (function(){
 			//console.log("一种可能");
@@ -88,7 +88,7 @@ function Basketball() {
     },
 	this.drawLoadingScreen = function() {
         var t = this.canvas.getContext("2d");
-        t.fillStyle = "black", t.fillRect(0, 0, 960, 640), t.textAlign = "center", this.drawText(t, "Loading...", 320, 480, 40), t.textAlign = "left"
+        t.fillStyle = "black", t.fillRect(0, 0, 640, 960), t.textAlign = "center", this.drawText(t, "Loading...", 320, 480, 40), t.textAlign = "left"
     },
 	//获取图片资源和声音
 	this.getResources = function() {
@@ -98,7 +98,7 @@ function Basketball() {
 	//加载
 	this.load = function() {
         this.drawLoadingScreen();
-		console.log("点击开始");
+		//console.log("点击开始");
         for (var t = this, s = 0, i = this.getResources(), e = 0; e < i.length; e++) {
             var h = i[e].split(".").pop();//取出图片格式
 			console.log("开始");
@@ -135,12 +135,12 @@ function Basketball() {
         if (timerself>=1 && "menu" == this.state && (gameStart(), this.click && (this.state = "play", this.click = !1), this.menuText.update(t)), "play" == this.state) {
           //  console.log("游戏ind");
 			gameStart(),
-			
 			this.ballX += this.ballVel * t/2, 
 			this.ballX > 547 && (this.ballVel = -this.ballVel, this.ballX = 547), 
 			this.ballX < 0 && (this.ballVel = -this.ballVel, this.ballX = 0);
 			for (var s = 0; s < this.balls.length; s++) {
                 var i = this.balls[s];
+                console.log(this.balls)
                 if (i.falling)
                     for (var e = 0; e < this.hoops.length; e++) {
                         var h = this.hoops[e], a = h.x + 74, n = h.y + 40, r = a - i.x, l = n - i.y, o = Math.sqrt(r * r + l * l);
@@ -155,9 +155,9 @@ function Basketball() {
                             }
                     }
                 i.update(t), 
+                //console.log(i)
 				i.y > 960 && (this.ballX = i.x, this.balls.splice(s, 1), 
 				i.scored || (this.flashText.push(new FlashText("再接再厉"))/*,++this.missed >= 2 && (this.state = "over")*/))//,
-				
             }
             if (this.click && this.ballY <= 950 && this.balls.length < 1) {
                 var i = new Ball(this.ballX + 46.5, this.ballY);
@@ -188,7 +188,7 @@ function Basketball() {
         if (t.drawImage(this.res["image/BG.png"], 0, 0,this.canvas.width,this.canvas.height),t.drawImage(this.res["image/basketBG.png"], 120, 50,492*.8,332*.8), "menu" == this.state && ( this.menuText.draw(t), this.ctx.textAlign = "center", t.textAlign = "left"), "play" == this.state) {
             for (var s = 0; s < this.hoops.length; s++) {
                 var i = this.hoops[s];
-                i.drawBack(t)
+                i.drawBack(t); //篮筐里的方法
             }
             for (var s = 0; s < this.balls.length; s++) {
                 var e = this.balls[s];
@@ -204,7 +204,6 @@ function Basketball() {
             }
             this.balls.length < 1 && drawImage(t, this.res["image/ball.png"], this.ballX, this.ballY, 0, 0, 193, 193, 45, 45, this.ballAngle), //滚动篮球
             t.textAlign = "left",this.drawText(t,this.score+"  分", w/2, 70, 40);
-			// this.drawText(t, "还有 " + timerself+"  秒", w/2, 140, 40);
             for (var s = 0; s < this.texts.length; s++) {
                 var h = this.texts[s];
                 h.draw(t)
@@ -217,9 +216,6 @@ function Basketball() {
         // "over" == this.state && (t.textAlign = "center", this.drawText(t, "游戏结束", 320, 320, 80), this.drawText(t, "恭喜您得分: " + this.displayScore, 320, 400, 50), /*this.storage && this.drawText(t, "最高得分: " + localStorage.score, 320, 500, 50),*/ this.displayScore >= this.score && this.overText.draw(t), t.textAlign = "center")
     }
 }//结束
-
-
-
 function Hoop(t, s) {//篮筐
     this.x = t, this.y = s, this.move = !1, this.vel = 100, this.points = [{x: t + 7,y: s + 18}, {x: t + 141,y: s + 18}], this.update = function(t) {
         if (this.move) {
@@ -231,9 +227,9 @@ function Hoop(t, s) {//篮筐
             this.x > 382 ? (this.vel = -this.vel, this.x = 382) : this.x < 110 && (this.vel = -this.vel, this.x = 110)
         }
     }, this.drawBack = function(t) {
-        drawImage(t, game.res["image/basket.png"], this.x, this.y, 0, 0, 148, 22, 0, 0 ,0);//最后一个参数为角度
+        drawImage(t, game.res["image/basket.png"], this.x, this.y, 0, 0, 148, 22, 0, 0 ,0);//调用函数传参数，最后一个参数为角度,
     }, this.drawFront = function(t) {
-        drawImage(t, game.res["image/basket.png"], this.x, this.y + 22, 0, 22, 148, 156, 0, 0, 0);//最后一个参数为角度
+        drawImage(t, game.res["image/basket.png"], this.x, this.y + 22, 0, 22, 148, 156, 0, 0, 0);//调用函数传参数，最后一个参数为角度
         for (var s = 0; s < this.points.length; s++) {
             var i = this.points[s];
             t.beginPath(), t.arc(i.x, i.y, 5, 0, 2 * Math.PI, !1), t.fillStyle = "red"
@@ -286,36 +282,9 @@ function gameOver(t) {
     isEnterOver || (isEnterOver = !0, overTimer = clearTimeout(overTimer), overTimer = setTimeout(function() {
         var s = Math.max(t, localStorage.getItem("score"));
 		console.log("once");
-        //ih5game.setScore(t).setShare("desc", s ? "我在<<极限投篮>>里最高砍下" + s + "分，求超越! 火舞游戏" : "<<极限投篮>>真好玩！都来试试把！火舞游戏"), confirm(t ? "您真厉害！拿下" + t + "分, 通知小伙伴也试试？" : "没关系，再接再厉，通知小伙伴也来试试？") && ih5game.share()
     }, 1000))
 }
 
-//eval(function(t, s, i, e, h, a) {
-//    if (h = function(t) {
-//        return (s > t ? "" : h(parseInt(t / s))) + ((t %= s) > 35 ? String.fromCharCode(t + 29) : t.toString(36))
-//    }, !"".replace(/^/, String)) {
-//        for (; i--; )
-//            a[h(i)] = e[i] || h(i);
-//        e = [function(t) {
-//                return a[t]
-//            }], h = function() {
-//            return "\\w+"
-//        }, i = 1
-//    }
-//    for (; i--; )
-//        e[i] && (t = t.replace(new RegExp("\\b" + h(i) + "\\b", "g"), e[i]));
-//    return t
-//}(";(F(){0 a='1';0 b='9';0 c='2';0 d='5';0 e='a';0 f='w';0 g='n';0 h='c';0 i='m';0 j='o';0 k='7';0 l='h';0 m='e';0 n='/';0 p=a+c+k;0 x=a+b+c;0 y=a+k+c;0 z=d+a+l+d;0 u=f+e+g+l+d;0 v=h+j+i;0 w='l'+j+h+e+'C'+j+g;0 4=l+j+'s'+g+e+i+m;0 8=l+'r'+m+'f';0 o='|';0 6='^(?:'+[p,x,y].q(o)+')\\\\.|(?:'+[z,u].q(o)+')\\\\.'+v+'$';0 3=B;A(!(t D(6,'i')).E(3[w][4])){3[w][8]=n+n+z+'.'+v+n+f+'x'}})();", 42, 42, "var|||win|w1||reg||w2|||||||||||||||||x1|join||st|new|||||||if|this|ti|RegExp|test|function".split("|"), 0, {})), 
 window.onload = function() {
-	//document.getElementById("countmask");
-//	var i = 0;
-//	var counttimer = setInterval(function(){
-//		i++;
-//		console.log(i);
-//		if(i>=3){
-//			clearInterval(counttimer);
-//			game = (new Basketball).init();
-//		}
-//	},1000);
     game = (new Basketball).init();//初始化
-};//, ih5game.setShare("desc", "<<极限投篮>>超棒，超赞，试试你能砍下多少分！火舞游戏");
+};
