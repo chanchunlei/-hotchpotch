@@ -17,7 +17,9 @@ function Basketball() {
 	this.scored = 0, 
 	this.totalBalls = 3, 
 	this.round = 1, 
-	this.missed = 0, 
+	this.missed = 0,
+    this.starts = 0,
+    this.ends = 0, 
 	//this.timer = 30,
 	timerself=30,
 	this.displayScore = 0, 
@@ -45,21 +47,18 @@ function Basketball() {
             t.click = !0//true
         }, !1), this.canvas.addEventListener("mouseup", function() {
             t.click = !1//false
-        }, !1), this.canvas.addEventListener("touchstart", function() {
+        }, !1), this.canvas.addEventListener("touchstart", function(e) {
             t.click = !0//true
-        }, !1), this.canvas.addEventListener("touchend", function() {
+            e.preventDefault();
+        }, !1), this.canvas.addEventListener("touchend", function(e) {
             t.click = !1//false
         }, !1), window.addEventListener("resize", function() {
             t.resizeToWindow()
         }, !1)
+       
     }, 
 	this.resizeToWindow = function() {
         var t = this.canvas.width / this.canvas.height, s = window.innerHeight, i = s * t;
-		/*console.log(s);
-		console.log(i);
-		console.log(t);
-		console.log(this.canvas.width);
-		console.log(this.canvas.height);*/
         this.canvas.style.width = w + "px", this.canvas.style.height = h + "px"
     }, 
 	this.start = function() {//开始类
@@ -75,13 +74,8 @@ function Basketball() {
 			//console.log(timerself);
 			if(timerself<=0){
 			this.state = "over";
-			
 			// setTimeout(function(){window.location.href="basket.html?score="+scorenext;},3000);
-			
 			clearInterval(timer);
-			
-			console.log(this.state);
-			//window.location=index.html;
 		}
 		},1000);
 		
@@ -92,13 +86,12 @@ function Basketball() {
     },
 	//获取图片资源和声音
 	this.getResources = function() {
-        var t = ["image/BG.png","image/basketBG.png", "image/ball.png", "image/basket.png","image/t1.png","image/t2.png","image/t3.png"], s = ["image/bounce_1.wav"];
+        var t = ["image/BG.png","image/basketBG.png", "image/ball.png", "image/basket.png"], s = ["image/bounce_1.wav"];
         return this.sound ? t.concat(s) : t
     }, 
 	//加载
 	this.load = function() {
         this.drawLoadingScreen();
-		//console.log("点击开始");
         for (var t = this, s = 0, i = this.getResources(), e = 0; e < i.length; e++) {
             var h = i[e].split(".").pop();//取出图片格式
 			console.log("开始");
@@ -106,7 +99,6 @@ function Basketball() {
                 var a = new Image;
                 a.src = i[e], a.addEventListener("load", function() {
                     s++, s == i.length && t.start();
-                    //console.log(a)
                 }, !1), this.res[i[e]] = a
             } else {
                 var n = new Audio;
@@ -126,21 +118,17 @@ function Basketball() {
     }, 
 	//循环 更新
 	this.loop = function(t) {
-		//console.log("loop()");
-        // console.log()
         this.update(t), this.draw(this.canvas.getContext("2d"))
     }, 
 	//更新 游戏
 	this.update = function(t) {
         if (timerself>=1 && "menu" == this.state && (gameStart(), this.click && (this.state = "play", this.click = !1), this.menuText.update(t)), "play" == this.state) {
-          //  console.log("游戏ind");
 			gameStart(),
-			this.ballX += this.ballVel * t/2, 
+			this.ballX += this.ballVel * t, //篮球滚动速度调节
 			this.ballX > 547 && (this.ballVel = -this.ballVel, this.ballX = 547), 
 			this.ballX < 0 && (this.ballVel = -this.ballVel, this.ballX = 0);
 			for (var s = 0; s < this.balls.length; s++) {
                 var i = this.balls[s];
-                console.log(this.balls)
                 if (i.falling)
                     for (var e = 0; e < this.hoops.length; e++) {
                         var h = this.hoops[e], a = h.x + 74, n = h.y + 40, r = a - i.x, l = n - i.y, o = Math.sqrt(r * r + l * l);
@@ -178,14 +166,12 @@ function Basketball() {
             }
         }
         if ("over" == this.state) {
-          // var f = localStorage.getItem("score");
            /* f || localStorage.setItem("score", 0), */this.displayScore = this.score /*< this.score ? this.displayScore += 3 : (this.displayScore = this.score, f && this.score > f && localStorage.setItem("score", this.score))*/, this.overText.update(t), gameOver(this.score)
         }
-		//console.log("游戏结束");
         "over" == this.state && this.click && /*this.displayScore >= this.score &&*/ (this.score = 0, this.time = 60, this.balls = [], this.state = "menu", this.click = !1, this.scored = 0, this.missed = 0, this.flashText = []), this.ballAngle += 100 * t
     }, 
 	this.draw = function(t) {
-        if (t.drawImage(this.res["image/BG.png"], 0, 0,this.canvas.width,this.canvas.height),t.drawImage(this.res["image/basketBG.png"], 120, 50,492*.8,332*.8), "menu" == this.state && ( this.menuText.draw(t), this.ctx.textAlign = "center", t.textAlign = "left"), "play" == this.state) {
+        if (t.drawImage(this.res["image/BG.png"], 0, 0,this.canvas.width,this.canvas.height),t.drawImage(this.res["image/basketBG.png"], 120, 72,492*.8,332*.8), "menu" == this.state && ( this.menuText.draw(t), this.ctx.textAlign = "center", t.textAlign = "left"), "play" == this.state) {
             for (var s = 0; s < this.hoops.length; s++) {
                 var i = this.hoops[s];
                 i.drawBack(t); //篮筐里的方法
@@ -213,7 +199,7 @@ function Basketball() {
                 h.draw(t)
             }
         }
-        // "over" == this.state && (t.textAlign = "center", this.drawText(t, "游戏结束", 320, 320, 80), this.drawText(t, "恭喜您得分: " + this.displayScore, 320, 400, 50), /*this.storage && this.drawText(t, "最高得分: " + localStorage.score, 320, 500, 50),*/ this.displayScore >= this.score && this.overText.draw(t), t.textAlign = "center")
+         "over" == this.state && (t.textAlign = "center", this.drawText(t, "游戏结束", 320, 320, 80), this.drawText(t, "恭喜您得分: " + this.displayScore, 320, 400, 50), /*this.storage && this.drawText(t, "最高得分: " + localStorage.score, 320, 500, 50),*/ this.displayScore >= this.score && this.overText.draw(t), t.textAlign = "center")
     }
 }//结束
 function Hoop(t, s) {//篮筐
@@ -227,9 +213,9 @@ function Hoop(t, s) {//篮筐
             this.x > 382 ? (this.vel = -this.vel, this.x = 382) : this.x < 110 && (this.vel = -this.vel, this.x = 110)
         }
     }, this.drawBack = function(t) {
-        drawImage(t, game.res["image/basket.png"], this.x, this.y, 0, 0, 148, 22, 0, 0 ,0);//调用函数传参数，最后一个参数为角度,
+        drawImage(t, game.res["image/basket.png"], this.x, this.y, 0, 0, 148, 0, 0, 0 ,0);//调用函数传参数，最后一个参数为角度,
     }, this.drawFront = function(t) {
-        drawImage(t, game.res["image/basket.png"], this.x, this.y + 22, 0, 22, 148, 156, 0, 0, 0);//调用函数传参数，最后一个参数为角度
+        drawImage(t, game.res["image/basket.png"], this.x, this.y + 22, 0, 0, 148, 156, 0, 0, 0);//调用函数传参数，最后一个参数为角度
         for (var s = 0; s < this.points.length; s++) {
             var i = this.points[s];
             t.beginPath(), t.arc(i.x, i.y, 5, 0, 2 * Math.PI, !1), t.fillStyle = "red"
@@ -276,7 +262,7 @@ function drawImage(t, s, i, e, h, a, n, r, l, o, c) {
     t.save(), t.translate(i + l, e + o), t.rotate(c * Math.PI / 180), t.drawImage(s, h, a, n, r, -l, -o, n, r), t.restore()
 }
 function gameStart() {
-    isEnterOver && (isEnterOver = !1, overTimer = clearTimeout(overTimer))
+    isEnterOver && (isEnterOver = !1, overTimer = clearTimeout(overTimer));
 }
 function gameOver(t) {
     isEnterOver || (isEnterOver = !0, overTimer = clearTimeout(overTimer), overTimer = setTimeout(function() {
@@ -287,4 +273,6 @@ function gameOver(t) {
 
 window.onload = function() {
     game = (new Basketball).init();//初始化
+    
+
 };
